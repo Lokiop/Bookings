@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Lokiop/Bookings/package/config"
-	"github.com/Lokiop/Bookings/package/handlers"
-	"github.com/Lokiop/Bookings/package/render"
+	"github.com/Lokiop/Bookings/internal/config"
+	"github.com/Lokiop/Bookings/internal/handlers"
+	"github.com/Lokiop/Bookings/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
 

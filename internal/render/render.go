@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/Lokiop/Bookings/package/config"
-	"github.com/Lokiop/Bookings/package/models"
+	"github.com/Lokiop/Bookings/internal/config"
+	"github.com/Lokiop/Bookings/internal/models"
+	"github.com/justinas/nosurf"
 )
 
 var functions = template.FuncMap{}
@@ -20,11 +21,13 @@ func NewTemplate(a *config.AppConfig) {
 	app = a
 }
 
-func AddTemplateData(td *models.TemplateData) *models.TemplateData {
+func AddTemplateData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken = nosurf.Token(r)
+
 	return td
 }
 
-func Rendertemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+func Rendertemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var templateCache map[string]*template.Template
 	if app.Usecache {
 		templateCache = app.TemplateCache
@@ -35,12 +38,12 @@ func Rendertemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 	tr, ok := templateCache[tmpl]
 
 	if !ok {
-		log.Fatal("Unable to grt template from Ccahe")
+		log.Fatal("Unable to get template from Cache")
 	}
 
 	buf := new(bytes.Buffer)
 
-	td = AddTemplateData(td)
+	td = AddTemplateData(td, r)
 	_ = tr.Execute(buf, td)
 
 	_, err := buf.WriteTo(w)
