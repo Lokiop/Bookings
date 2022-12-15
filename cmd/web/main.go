@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 
 	"github.com/Lokiop/Bookings/internal/config"
 	"github.com/Lokiop/Bookings/internal/handlers"
+	"github.com/Lokiop/Bookings/internal/models"
 	"github.com/Lokiop/Bookings/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
@@ -18,6 +20,31 @@ var app config.AppConfig
 var session *scs.SessionManager
 
 func main() {
+
+	err := run()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// http.HandleFunc("/", handlers.Repo.Home)
+	// http.HandleFunc("/about", handlers.Repo.About)
+
+	fmt.Println("Server Starting at port", portnumber)
+	// _ = http.ListenAndServe(portnumber, nil)
+
+	srv := &http.Server{
+		Addr:    portnumber,
+		Handler: routes(&app),
+	}
+
+	err = srv.ListenAndServe()
+	log.Fatal(err)
+}
+
+func run() error {
+	//what I am going to store in the session
+	gob.Register(models.Reservation{})
 
 	//Changers to true when in production
 	app.InProduction = false
@@ -34,6 +61,7 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Cannot Create template cache")
+		return err
 	}
 
 	app.TemplateCache = tc
@@ -43,17 +71,5 @@ func main() {
 	handlers.NewHandlers(repo)
 	render.NewTemplate(&app)
 
-	// http.HandleFunc("/", handlers.Repo.Home)
-	// http.HandleFunc("/about", handlers.Repo.About)
-
-	fmt.Println("Server Starting at port", portnumber)
-	// _ = http.ListenAndServe(portnumber, nil)
-
-	srv := &http.Server{
-		Addr:    portnumber,
-		Handler: routes(&app),
-	}
-
-	err = srv.ListenAndServe()
-	log.Fatal(err)
+	return nil
 }
