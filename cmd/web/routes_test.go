@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/Lokiop/Bookings/internal/config"
@@ -17,6 +16,6 @@ func TestRoutes(t *testing.T) {
 	case *chi.Mux:
 		//do nothing. Test passed
 	default:
-		t.Error(fmt.Sprintf("type is not *chi.Mux, But type is %T", v))
+		t.Errorf("type is not *chi.Mux, But type is %T", v)
 	}
 }
