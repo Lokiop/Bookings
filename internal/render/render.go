@@ -2,9 +2,9 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -16,6 +16,7 @@ import (
 var functions = template.FuncMap{}
 
 var app *config.AppConfig
+var pathToTemplates = "./templates"
 
 func NewTemplate(a *config.AppConfig) {
 	app = a
@@ -30,7 +31,7 @@ func AddTemplateData(td *models.TemplateData, r *http.Request) *models.TemplateD
 	return td
 }
 
-func Rendertemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func Rendertemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var templateCache map[string]*template.Template
 	if app.Usecache {
 		templateCache = app.TemplateCache
@@ -41,7 +42,7 @@ func Rendertemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	tr, ok := templateCache[tmpl]
 
 	if !ok {
-		log.Fatal("Unable to get template from Cache")
+		return errors.New("can't get template from cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -52,14 +53,16 @@ func Rendertemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Unable to write template to the browser")
+		return err
 	}
 
+	return nil
 }
 
 func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
-	pages, err := filepath.Glob("./templates/*.page.html")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.html", pathToTemplates))
 
 	if err != nil {
 		return myCache, err
@@ -74,14 +77,14 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 			return myCache, err
 		}
 
-		count, err := filepath.Glob("./templates/*.layout.html")
+		count, err := filepath.Glob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 
 		if err != nil {
 			return myCache, err
 		}
 
 		if len(count) > 0 {
-			tr, err = tr.ParseGlob("./templates/*.layout.html")
+			tr, err = tr.ParseGlob(fmt.Sprintf("%s/*.layout.html", pathToTemplates))
 			if err != nil {
 				return myCache, err
 			}
