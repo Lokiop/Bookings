@@ -40,11 +40,7 @@ func (f *Form) Required(fields ...string) {
 func (f *Form) Has(field string) bool {
 	x := f.Get(field)
 
-	if x == "" {
-		return false
-	}
-
-	return true
+	return x != ""
 }
 
 // MinLength checks for the minimum length of the string
