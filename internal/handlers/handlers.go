@@ -6,10 +6,13 @@ import (
 	"net/http"
 
 	"github.com/Lokiop/Bookings/internal/config"
+	"github.com/Lokiop/Bookings/internal/drivers"
 	"github.com/Lokiop/Bookings/internal/forms"
 	"github.com/Lokiop/Bookings/internal/helpers"
 	"github.com/Lokiop/Bookings/internal/models"
 	"github.com/Lokiop/Bookings/internal/render"
+	"github.com/Lokiop/Bookings/internal/repository"
+	"github.com/Lokiop/Bookings/internal/repository/dbrepo"
 )
 
 var Repo *Repository
@@ -17,12 +20,14 @@ var Repo *Repository
 // Reposirory type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // Creates a new Repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *drivers.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -32,11 +37,11 @@ func NewHandlers(r *Repository) {
 }
 
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "home.page.html", &models.TemplateData{})
+	render.Template(w, r, "home.page.html", &models.TemplateData{})
 }
 
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "about.page.html", &models.TemplateData{})
+	render.Template(w, r, "about.page.html", &models.TemplateData{})
 }
 
 // Reservation renders the make a reservation page and displays a form
@@ -44,7 +49,7 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	var emptyReservation models.Reservation
 	data := make(map[string]interface{})
 	data["reservation"] = emptyReservation
-	render.Rendertemplate(w, r, "make-reservation.page.html", &models.TemplateData{
+	render.Template(w, r, "make-reservation.page.html", &models.TemplateData{
 		Form: forms.New(nil),
 		Data: data,
 	})
@@ -76,7 +81,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
-		render.Rendertemplate(w, r, "make-reservation.page.html", &models.TemplateData{
+		render.Template(w, r, "make-reservation.page.html", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
@@ -92,17 +97,17 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 // Generals renders the room page for generals quarters rooms
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "generals.page.html", &models.TemplateData{})
+	render.Template(w, r, "generals.page.html", &models.TemplateData{})
 }
 
 // Colonels renders the room page for the Colonels suite
 func (m *Repository) Colonels(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "colonels.page.html", &models.TemplateData{})
+	render.Template(w, r, "colonels.page.html", &models.TemplateData{})
 }
 
 // Availability renders the seacrh-availability page
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "search-availability.page.html", &models.TemplateData{})
+	render.Template(w, r, "search-availability.page.html", &models.TemplateData{})
 }
 
 // Availability renders the seacrh-availability page
@@ -136,7 +141,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 // Contact renders the Contact availability page
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.Rendertemplate(w, r, "contact.page.html", &models.TemplateData{})
+	render.Template(w, r, "contact.page.html", &models.TemplateData{})
 }
 
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
@@ -154,7 +159,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
 
-	render.Rendertemplate(w, r, "reservation-summary.page.html", &models.TemplateData{
+	render.Template(w, r, "reservation-summary.page.html", &models.TemplateData{
 		Data: data,
 	})
 }

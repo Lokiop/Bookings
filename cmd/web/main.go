@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Lokiop/Bookings/internal/config"
+	"github.com/Lokiop/Bookings/internal/drivers"
 	"github.com/Lokiop/Bookings/internal/handlers"
 	"github.com/Lokiop/Bookings/internal/helpers"
 	"github.com/Lokiop/Bookings/internal/models"
@@ -25,11 +26,12 @@ var errorLog *log.Logger
 
 func main() {
 
-	err := run()
-
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	defer db.SQL.Close()
 
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
@@ -46,9 +48,12 @@ func main() {
 	log.Fatal(err)
 }
 
-func run() error {
+func run() (*drivers.DB, error) {
 	//what I am going to store in the session
+	gob.Register(models.User{})
 	gob.Register(models.Reservation{})
+	gob.Register(models.Room{})
+	gob.Register(models.Restriction{})
 
 	//Changers to true when in production
 	app.InProduction = false
@@ -67,20 +72,28 @@ func run() error {
 
 	app.Session = session
 
+	//connect to database
+	log.Println("Connecting to Database....")
+	db, err := drivers.ConnectSQL("host=localhost port=5432 dbname=Bookings user=postgres password=D@rshanheda24")
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying....")
+	}
+	log.Println("Connected to Database....")
+
 	tc, err := render.CreateTemplateCache()
 
 	if err != nil {
 		log.Fatal("Cannot Create template cache")
-		return err
+		return nil, err
 	}
 
 	app.TemplateCache = tc
 	app.Usecache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
-	render.NewTemplate(&app)
+	render.NewRenderer(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }
