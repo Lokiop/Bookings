@@ -59,3 +59,8 @@ type RoomRestriction struct {
 	Reservation   Reservation
 	Restriction   Restriction
 }
+
+//ErrorPage is for the error page
+type ErrorPage struct {
+	ErrorInfo map[string]string
+}

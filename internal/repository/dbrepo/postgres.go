@@ -152,5 +152,5 @@ func (m *postgresDBRepo) GetRoomByID(id int) (models.Room, error) {
 		return room, err
 	}
 
-	return room, err
+	return room, nil
 }
