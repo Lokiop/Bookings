@@ -33,6 +33,10 @@ func main() {
 
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+	fmt.Println("Starting mail listener...")
+	listenForMail()
+
 	// http.HandleFunc("/", handlers.Repo.Home)
 	// http.HandleFunc("/about", handlers.Repo.About)
 
@@ -55,6 +59,9 @@ func run() (*drivers.DB, error) {
 	gob.Register(models.Room{})
 	gob.Register(models.Restriction{})
 	gob.Register(models.ErrorPage{})
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 
 	//Changers to true when in production
 	app.InProduction = false
