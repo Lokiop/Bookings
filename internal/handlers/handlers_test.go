@@ -297,8 +297,8 @@ func TestRepository_PostAvailability(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	// since we have no rooms available, we expect to get status http.StatusSeeOther
-	if rr.Code != http.StatusTemporaryRedirect {
-		t.Errorf("Post availability when no rooms available gave wrong status code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
+	if rr.Code != http.StatusSeeOther {
+		t.Errorf("Post availability when no rooms available gave wrong status code: got %d, wanted %d", rr.Code, http.StatusSeeOther)
 	}
 
 	/*****************************************

@@ -17,7 +17,7 @@ func TestAddTemlateData(t *testing.T) {
 
 	session.Put(r.Context(), "flash", "123")
 
-	result := AddTemplateData(&td, r)
+	result := AddDefaultData(&td, r)
 
 	if result.Flash != "123" {
 		t.Error("flash value of 123 not found n session")

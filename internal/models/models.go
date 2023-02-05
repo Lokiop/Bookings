@@ -62,11 +62,6 @@ type RoomRestriction struct {
 	Restriction   Restriction
 }
 
-// ErrorPage is for the error page
-type ErrorPage struct {
-	ErrorInfo map[string]string
-}
-
 // MailData holds an email message
 type MailData struct {
 	To       string

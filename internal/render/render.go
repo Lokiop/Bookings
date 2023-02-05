@@ -23,11 +23,14 @@ func NewRenderer(a *config.AppConfig) {
 }
 
 // AddTemplateData adds data for all templates
-func AddTemplateData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
 	td.CSRFToken = nosurf.Token(r)
+	if app.Session.Exists(r.Context(), "user_id") {
+		td.IsAuthenticated = 1
+	}
 
 	return td
 }
@@ -50,7 +53,7 @@ func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.Te
 
 	buf := new(bytes.Buffer)
 
-	td = AddTemplateData(td, r)
+	td = AddDefaultData(td, r)
 	_ = tr.Execute(buf, td)
 
 	_, err := buf.WriteTo(w)
