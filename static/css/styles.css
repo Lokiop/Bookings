@@ -18,3 +18,8 @@
 .datepicker {
     z-index: 10000;
 }
+
+.liright {
+    float: right;
+    margin-right: 1%;
+}
