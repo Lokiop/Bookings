@@ -17,7 +17,15 @@
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
 
     <style>
+        label {
+            font-weight: bold;
+        }
+
+        .notie-container {
+            z-index: 50000;
+        }
     </style>
+
     {{block "css" .}}
 
     {{end}}
@@ -84,6 +92,7 @@
     {{block "js" .}}
 
     {{end}}
+
     <script>
         let attention = Prompt();
         (() => {

@@ -7,19 +7,28 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/Lokiop/Bookings/internal/config"
 	"github.com/Lokiop/Bookings/internal/models"
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
 
 var app *config.AppConfig
 var pathToTemplates = "./templates"
 
+// NewRenderer sets the config for the template package
 func NewRenderer(a *config.AppConfig) {
 	app = a
+}
+
+// HumanDate returns date in dd-mm-yyyy format
+func HumanDate(t time.Time) string {
+	return t.Format("02-01-2006")
 }
 
 // AddTemplateData adds data for all templates
